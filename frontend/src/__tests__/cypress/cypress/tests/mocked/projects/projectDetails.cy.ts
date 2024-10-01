@@ -12,7 +12,10 @@ import { mockServiceAccountK8sResource } from '~/__mocks__/mockServiceAccountK8s
 import { mockProjectK8sResource } from '~/__mocks__/mockProjectK8sResource';
 import { mockRouteK8sResource } from '~/__mocks__/mockRouteK8sResource';
 import { mockSecretK8sResource } from '~/__mocks__/mockSecretK8sResource';
-import { mockServingRuntimeTemplateK8sResource } from '~/__mocks__/mockServingRuntimeTemplateK8sResource';
+import {
+  mockServingRuntimeTemplateK8sResource,
+  mockNIMServingRuntimeTemplate,
+} from '~/__mocks__/mockServingRuntimeTemplateK8sResource';
 import { projectDetails } from '~/__tests__/cypress/cypress/pages/projects';
 import { ServingRuntimePlatform } from '~/types';
 import {
@@ -39,6 +42,7 @@ type HandlersProps = {
   disableKServeConfig?: boolean;
   disableKServeMetrics?: boolean;
   disableModelConfig?: boolean;
+  disableNIMModelServing?: boolean;
   isEnabled?: string;
   isUnknown?: boolean;
   templates?: boolean;
@@ -51,6 +55,7 @@ const initIntercepts = ({
   disableKServeConfig,
   disableKServeMetrics,
   disableModelConfig,
+  disableNIMModelServing,
   isEmpty = false,
   imageStreamName = 'test-image',
   imageStreamTag = 'latest',
@@ -99,11 +104,19 @@ const initIntercepts = ({
         : [],
     ),
   );
+  if (!disableNIMModelServing) {
+    cy.interceptK8s(
+      { model: TemplateModel, ns: 'opendatahub' },
+      mockNIMServingRuntimeTemplate({}),
+    );
+  }
+
   cy.interceptOdh(
     'GET /api/config',
     mockDashboardConfig({
       disableKServe: disableKServeConfig,
       disableModelMesh: disableModelConfig,
+      disableNIMModelServing,
       disableKServeMetrics,
     }),
   );
@@ -282,6 +295,20 @@ describe('Project Details', () => {
 
     it('Single model serving platform is enabled', () => {
       initIntercepts({ templates: true, disableKServeConfig: false, disableModelConfig: true });
+      projectDetails.visit('test-project');
+      projectDetails.shouldBeEmptyState('Models', 'model-server', true);
+      projectDetails.findServingPlatformLabel().should('have.text', 'Single-model serving enabled');
+    });
+
+    it('NIM model serving platform is enabled', () => {
+      initIntercepts({
+        templates: true,
+        disableKServeConfig: false,
+        disableModelConfig: true,
+        disableNIMModelServing: false,
+      });
+
+      // TO BE COMPLETED ONCE THE NIM CARD APPEARS
       projectDetails.visit('test-project');
       projectDetails.shouldBeEmptyState('Models', 'model-server', true);
       projectDetails.findServingPlatformLabel().should('have.text', 'Single-model serving enabled');
