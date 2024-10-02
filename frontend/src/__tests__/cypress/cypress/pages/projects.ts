@@ -235,6 +235,14 @@ class ProjectDetails {
     return this.findModelServingPlatform('multi').findByTestId('multi-serving-add-server-button');
   }
 
+  findNimModelDeployButton() {
+    return this.findNimModelServingPlatformCard().findByTestId('nim-serving-deploy-button');
+  }
+
+  findNimModelServingPlatformCard() {
+    return cy.findByTestId('nvidia-nim-model-serving-platform-card');
+  }
+
   findDeployModelTooltip() {
     return cy.findByTestId('model-serving-action-tooltip');
   }
@@ -244,8 +252,8 @@ class ProjectDetails {
     return this;
   }
 
-  findServingPlatformLabel() {
-    return cy.findByTestId('serving-platform-label');
+  findServingPlatformLabel(label = 'serving-platform-label') {
+    return cy.findByTestId(label);
   }
 
   findComponent(componentName: string) {
