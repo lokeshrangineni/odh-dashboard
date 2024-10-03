@@ -36,7 +36,11 @@ import { mockQuickStarts } from '~/__mocks__/mockQuickStarts';
 import { mockRoleBindingK8sResource } from '~/__mocks__/mockRoleBindingK8sResource';
 import { mockPodK8sResource } from '~/__mocks__/mockPodK8sResource';
 import { nimDeployModal } from '~/__tests__/cypress/cypress/pages/nimModelDialog';
-import { findServingPlatformLabel } from '~/__tests__/cypress/cypress/utils/nimUtils';
+import {
+  findNimModelDeployButton,
+  findNimModelServingPlatformCard,
+  findServingPlatformLabel
+} from '~/__tests__/cypress/cypress/utils/nimUtils';
 import {
   nimDeployModal,
 } from '~/__tests__/cypress/cypress/pages/modelServing';
@@ -308,14 +312,12 @@ describe('Model Serving NIM', () => {
     projectDetails.findSingleModelDeployButton().should('exist');
     projectDetails.findMultiModelButton().should('exist');
 
-    projectDetails
-      .findNimModelServingPlatformCard()
+    findNimModelServingPlatformCard()
       .contains('Models are deployed using NVIDIA NIM microservices.');
-    projectDetails
-      .findNimModelServingPlatformCard()
+    findNimModelServingPlatformCard()
       .contains('NVIDIA NIM model serving platform');
 
-    validateNvidiaNimModel(projectDetails.findNimModelDeployButton())
+    validateNvidiaNimModel(findNimModelDeployButton())
   });
 
 
